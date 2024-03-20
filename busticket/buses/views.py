@@ -1,3 +1,31 @@
-from django.shortcuts import render
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+from .models import Route, Bus, Place
+from .serializers import RouteSerializer, BusSerializer, PlaceSerializer
 
-# Create your views here.
+class RouteList(APIView):
+    def get(self, request):
+        routes = Route.objects.all()
+        serializer = RouteSerializer(routes, many=True)
+        return Response(serializer.data)
+
+    def post(self, request):
+        serializer = RouteSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class BusList(APIView):
+    def get(self, request):
+        buses = Bus.objects.all()
+        serializer = BusSerializer(buses, many=True)
+        return Response(serializer.data)
+
+    def post(self, request):
+        serializer = BusSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

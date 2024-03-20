@@ -44,8 +44,9 @@ INSTALLED_APPS = [
     'rest_framework',
     'corsheaders',
     'rest_framework_simplejwt.token_blacklist',
-    'knox',
+    'rest_framework_simplejwt',
     'users',
+    'buses',
 ]
 
 MIDDLEWARE = [
@@ -79,19 +80,19 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'busticket.wsgi.application'
 
-# REST_FRAMEWORK = {
-#     'DEFAULT_AUTHENTICATION_CLASSES': [
-#         'rest_framework_simplejwt.authentication.JWTAuthentication',
-#     ],
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
 
-# }
+}
 
-# SIMPLE_JWT = {
-#      'ACCESS_TOKEN_LIFETIME': timedelta(minutes=10),
-#      'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
-#      'ROTATE_REFRESH_TOKENS': True,
-#      'BLACKLIST_AFTER_ROTATION': True
-# }
+SIMPLE_JWT = {
+     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=10),
+     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+     'ROTATE_REFRESH_TOKENS': True,
+     'BLACKLIST_AFTER_ROTATION': True
+}
 
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
