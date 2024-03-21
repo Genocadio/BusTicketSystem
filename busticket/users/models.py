@@ -2,6 +2,9 @@ from django.core.validators import MinLengthValidator, RegexValidator
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from django.db import models
 
+from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
+from django.db import models
+
 class UserManager(BaseUserManager):
     def create_user(self, email, name, password=None, user_type='normal'):
         if not email:
