@@ -1,24 +1,78 @@
-from rest_framework import serializers
-from django.contrib.auth.hashers import make_password
-from django.contrib.auth.password_validation import validate_password
-from django.core.exceptions import ValidationError
-from .models import User
+from django.shortcuts import get_object_or_404
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework.exceptions import AuthenticationFailed
+from rest_framework.permissions import IsAuthenticated
+from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.authentication import JWTAuthentication
+from users.serializers import UserSerializer
+from django.utils import timezone
+from users.models import User
+from .permisions import IsAdminUser, IsNormalUser
 
-class UserSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(write_only=True, required=True, validators=[validate_password])
-    
-    class Meta:
-        model = User
-        fields = ['id', 'name', 'email', 'password', 'user_type']
-        extra_kwargs = {
-            'username': {'read_only': True},
+class Register(APIView):
+    def post(self, request, format=None):
+        serializer = UserSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)
+
+class LoginView(APIView):
+    def post(self, request, format=None):
+        email = request.data.get('email')
+        password = request.data.get('password')
+
+        if not email or not password:
+            raise AuthenticationFailed('Please provide both email and password')
+
+        user = get_object_or_404(User, email=email)
+
+        if not user.check_password(password):
+            raise AuthenticationFailed('Incorrect password')
+
+        # Generate access token with expiry time
+        refresh = RefreshToken.for_user(user)
+        access_token = str(refresh.access_token)
+
+        # Set access token as cookie
+        response = Response()
+        response.set_cookie(key='jwt', value=access_token, httponly=True)
+        response.data = {
+            'message': 'Login successful',
+            'jwt': access_token,
         }
+        return response
 
-    def create(self, validated_data):
-        password = validated_data.pop('password', None)
-        user_type = validated_data.pop('user_type', 'normal')  # Default to 'normal' user type if not provided
-        instance = self.Meta.model(**validated_data, user_type=user_type)
-        if password is not None:
-            instance.password = make_password(password)
-        instance.save()
-        return instance
+class UserView(APIView):
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [JWTAuthentication]
+
+    def get(self, request):
+        user = request.user
+        serializer = UserSerializer(user)
+        return Response(serializer.data)
+
+class LogoutView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        response = Response()
+        response.delete_cookie('jwt')
+        response.data = {
+            'message': 'Successfully logged out'
+        }
+        return response
+
+class AdminView(APIView):
+    permission_classes = [IsAdminUser, IsAuthenticated]
+    
+    def get(self, request):
+        user_type = request.user.user_type
+        return Response({"user type": user_type})
+
+class NormalView(APIView):
+    permission_classes = [IsNormalUser, IsAuthenticated]
+    
+    def get(self, request):
+        user_type = request.user.user_type
+        return Response({"user type": user_type})
