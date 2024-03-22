@@ -8,6 +8,7 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 from users.serializers import UserSerializer
 from django.utils import timezone
 from users.models import User
+from .permisions import IsAdminUser, IsNormalUser
 
 class Register(APIView):
     def post(self, request, format=None):
@@ -61,3 +62,17 @@ class LogoutView(APIView):
             'message': 'Successfully logged out'
         }
         return response
+
+class AdminView(APIView):
+    permission_classes = [IsAdminUser, IsAuthenticated]
+    
+    def get(self, request):
+        user_type = request.user.user_type
+        return Response({"user type": user_type})
+
+class NormalView(APIView):
+    permission_classes = [IsNormalUser, IsAuthenticated]
+    
+    def get(self, request):
+        user_type = request.user.user_type
+        return Response({"user type": user_type})
