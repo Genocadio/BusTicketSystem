@@ -1,21 +1,24 @@
-"""Bus ticket booking system models for saving data to the database"""
 from django.db import models
 
-
 class Route(models.Model):
-    """Route model for saving route information to the database"""
     name = models.CharField(max_length=100)
+    price = models.DecimalField(max_digits=10, decimal_places=2)
 
+    def __str__(self):
+        return self.name
 
 class Bus(models.Model):
-    """Bus model for saving bus information to the database"""
-    name = models.CharField(max_length=100)
+    base_name = models.CharField(max_length=100, unique=True)
+    number_of_seats = models.IntegerField()
+
+    def __str__(self):
+        return self.base_name
+
+class Trip(models.Model):
     route = models.ForeignKey(Route, on_delete=models.CASCADE)
-    capacity = models.IntegerField()
-
-
-class Place(models.Model):
-    """Place model for saving place information to the database"""
     bus = models.ForeignKey(Bus, on_delete=models.CASCADE)
-    number = models.IntegerField()
-    is_reserved = models.BooleanField(default=False)
+    departure_time = models.DateTimeField()
+    arrival_time = models.DateTimeField()
+
+    def __str__(self):
+        return f"Trip from {self.route.name} by {self.bus.base_name}"
