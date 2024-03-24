@@ -44,16 +44,31 @@ class LoginView(APIView):
         return response
 
 class UserView(APIView):
-    permission_classes = [IsAuthenticated]
-    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAdminUser]
 
     def get(self, request):
         user = request.user
         serializer = UserSerializer(user)
         return Response(serializer.data)
+    def delete(self, request):
+        self.check_permissions(request)
+        self.permission_classes = [IsAdminUser]
+        self.check_permissions(request)
+        user = request.user
+        user.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+    def put(self, request):
+        self.check_permissions(request)
+        self.permission_classes = [IsAdminUser]
+        self.check_permissions(request)
+        user = request.user
+        serializer = UserSerializer(user, data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)
 
 class LogoutView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAdminUser]
 
     def post(self, request):
         response = Response()
