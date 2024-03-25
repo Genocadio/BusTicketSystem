@@ -1,5 +1,7 @@
-from django.core.validators import MinLengthValidator, RegexValidator
+from django.contrib.auth.hashers import make_password
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
+from django.core.exceptions import ValidationError
+from django.core.validators import MinLengthValidator, RegexValidator
 from django.db import models
 
 class UserManager(BaseUserManager):
@@ -18,7 +20,6 @@ class UserManager(BaseUserManager):
         user.save(using=self._db)
         return user
 
-
 def validate_password(value):
     validators = [
         MinLengthValidator(8, message='Password must be at least 8 characters long'),
@@ -33,7 +34,6 @@ def validate_password(value):
             errors.update(e.message_dict)
     if errors:
         raise ValidationError(errors)
-
 
 class User(AbstractBaseUser):
     USER_TYPE_CHOICES = [
@@ -50,3 +50,11 @@ class User(AbstractBaseUser):
     REQUIRED_FIELDS = ['name']
 
     objects = UserManager()
+
+class RefreshTokenEntry(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    token = models.CharField(max_length=255, unique=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.user.email} - {self.token}"

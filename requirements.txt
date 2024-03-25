@@ -1,0 +1,8 @@
+django==3.2.12
+djangorestframework==3.12.4
+django-cors-headers==3.8.0
+djangorestframework-simplejwt==5.0.0
+django-mysql==3.11.2
+mysqlclient==2.1.0
+django_redis==5.0.0
+
