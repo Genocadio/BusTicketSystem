@@ -113,7 +113,7 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'busticket',
-        'USER': 'busticket',
+        'USER': 'root',
         'PASSWORD': 'Cadio*11.',
     }
 }

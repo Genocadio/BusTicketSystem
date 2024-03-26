@@ -12,8 +12,24 @@ from .permisions import IsAdminUser, IsNormalUser
 from users.models import User, RefreshTokenEntry
 from rest_framework import status
 
+"""
+* User view
+* The raoutes here have three permissions
+  * IsAdminUser
+  * IsNormalUser
+  * IsAuthenticated
+* to pass all these permisions you must pass the token as authentication bearer token
+  * the token must be valid and correspond to the required permissions
+  * else the user wont be autorized
+"""
 
 class Register(APIView):
+    """
+     * route to register user
+     * accepts json with email, name, password and user_type
+     * user_type can be normal or admin 
+     * if user_type is not provided, defaults to normal
+     *"""
     def post(self, request, format=None):
         serializer = UserSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -21,6 +37,11 @@ class Register(APIView):
         return Response(serializer.data)
 
 class LoginView(APIView):
+    """
+    * route to login user
+    * accepts json with email and password
+    * returns json with access_token and refresh_token
+    """
     def post(self, request, format=None):
         email = request.data.get('email')
         password = request.data.get('password')
@@ -54,10 +75,21 @@ class UserView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
+        """ 
+        * route to fetch user information
+        * returns json with user information
+        """
         user = request.user
         serializer = UserSerializer(user)
         return Response(serializer.data)
+
+
     def delete(self, request, email):
+        """
+        * route to delete user
+        * accepts email address for the user
+        * returns 204 No Content
+        """
         self.check_permissions(request)  # Check if the user is authenticated
         self.permission_classes = [IsAdminUser]  # Set permission classes for admin user
         self.check_permissions(request)  # Check if the user has admin permissions
@@ -66,7 +98,16 @@ class UserView(APIView):
         user.delete()  # Delete the user
 
         return Response({"message": f"User with email '{email}' has been deleted."}, status=status.HTTP_204_NO_CONTENT)
+
+
     def put(self, request):
+        """
+        * route to update user information
+        * accepts json with email, name, password and user_type
+        * user_type can be normal or admin
+        * if user_type is not provided, defaults to normal
+        * returns json with updated user information
+        """
         self.check_permissions(request)
         self.permission_classes = [IsAdminUser]
         self.check_permissions(request)
@@ -80,6 +121,10 @@ class LogoutView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request, format=None):
+        """
+        * route for logging out user
+        * returns  Logout successful
+        """
         # Retrieve the user from the request object
         user = request.user
         
@@ -100,6 +145,10 @@ class LogoutView(APIView):
             raise AuthenticationFailed('No refresh token found for the user')
 
 class AdminView(APIView):
+    """ 
+    * route to fetch all users
+    * returns json with user information for all registered users
+    """
     permission_classes = [IsAdminUser]
 
     def get(self, request):

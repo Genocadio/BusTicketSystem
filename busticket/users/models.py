@@ -5,6 +5,10 @@ from django.core.validators import MinLengthValidator, RegexValidator
 from django.db import models
 
 class UserManager(BaseUserManager):
+    """
+    Custom user manager that supports using email instead of username
+    """
+    
     def create_user(self, email, name, password=None, user_type='normal'):
         if not email:
             raise ValueError('Email address is required')
