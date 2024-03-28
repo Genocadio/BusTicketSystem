@@ -235,9 +235,9 @@ Certain endpoints have specific permission requirements enforced using Django RE
 
 - Response: 204 No Content
 
-3. ### Bus Detail (POST /bookings/bookings)
-- **/bookings/bookings**
+3. ### Bus Detail (POST /bookings/booking/<int:booking_id>)
+- **/bookings/booking/<int:booking_id>**
 - Description: Add a single booking to database
 - Permissions: IsAuthenticated
-- Request:  Json with the user id and trip id from database
+- Request:  replace <int:booking_id> withbooking id from database
 - Response: Json with the added booking info
