@@ -3,6 +3,7 @@ from buses.models import Trip
 from users.models import User as CustomUser
 
 class Booking(models.Model):
+    """ Bookings model """
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     trip = models.ForeignKey(Trip, on_delete=models.CASCADE)
     num_tickets = models.PositiveIntegerField(default=1)

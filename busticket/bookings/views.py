@@ -1,3 +1,4 @@
+""" Bookings view"""
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -7,8 +8,16 @@ from django.core.cache import cache
 from rest_framework.permissions import IsAuthenticated
 
 class BookingList(APIView):
+    """
+    * This class handles bookings and require authentication
+    """
     permission_classes = [IsAuthenticated]
     def get(self, request):
+        """
+        * get all bookings made
+        * returns json with all bookings
+        * require authentication
+        """
         cached_bookings = cache.get('cached_bookings')
         if not cached_bookings:
             bookings = Booking.objects.all()
@@ -18,6 +27,12 @@ class BookingList(APIView):
         return Response(cached_bookings)
 
     def post(self, request):
+        """
+        * Add a new booking to database
+        * User Id and Trip Id required
+        * require authentication
+        * returns json with new booking info
+        """
         serializer = BookingSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
@@ -27,6 +42,10 @@ class BookingList(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def delete(self, request):
+        """
+        * delete a single booking from the database
+        * Booking Id required
+        """
         try:
             booking_id = request.data.get('booking_id')  # Assuming booking_id is passed in the request data
             booking = Booking.objects.get(pk=booking_id)

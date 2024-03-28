@@ -108,9 +108,7 @@ class UserView(APIView):
         * if user_type is not provided, defaults to normal
         * returns json with updated user information
         """
-        self.check_permissions(request)
-        self.permission_classes = [IsAdminUser]
-        self.check_permissions(request)
+
         user = request.user
         serializer = UserSerializer(user, data=request.data)
         serializer.is_valid(raise_exception=True)
