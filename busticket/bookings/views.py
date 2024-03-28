@@ -6,6 +6,7 @@ from .models import Booking
 from .serializers import BookingSerializer
 from django.core.cache import cache
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.exceptions import NotFound
 
 class BookingList(APIView):
     """
@@ -41,17 +42,19 @@ class BookingList(APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    def delete(self, request):
-        """
-        * delete a single booking from the database
-        * Booking Id required
-        """
+class BookingDel(APIView):
+    """
+    * Delete a booking from database
+    * Booking Id required
+    * require authentication
+    """
+    permission_classes = [IsAuthenticated]
+
+    def delete(self, request, booking_id):
         try:
-            booking_id = request.data.get('booking_id')  # Assuming booking_id is passed in the request data
             booking = Booking.objects.get(pk=booking_id)
             booking.delete()
-            # Invalidate cached bookings after deleting a booking
             cache.delete('cached_bookings')
             return Response(status=status.HTTP_204_NO_CONTENT)
         except Booking.DoesNotExist:
-            return Response({"message": "Booking not found"}, status=status.HTTP_404_NOT_FOUND)
+            raise NotFound("Booking not found")

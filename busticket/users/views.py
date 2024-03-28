@@ -11,6 +11,7 @@ from users.models import User
 from .permisions import IsAdminUser, IsNormalUser
 from users.models import User, RefreshTokenEntry
 from rest_framework import status
+from django.contrib.auth.hashers import make_password
 
 """
 * User view
@@ -110,7 +111,11 @@ class UserView(APIView):
         """
 
         user = request.user
-        serializer = UserSerializer(user, data=request.data)
+        data = request.data.copy() 
+        if 'password' in data:
+            data['password'] = make_password(data['password']) 
+
+        serializer = UserSerializer(user, data=data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data)
