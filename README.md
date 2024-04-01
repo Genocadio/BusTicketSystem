@@ -15,7 +15,6 @@ BusTicketSystem is a backend API built with Django to handle user registration a
 - **Caching:** Redis
 - **Dependency Management:** pip with requirements.txt
 - **Version Control:** Git
-- **Deployment:** Heroku (for production deployment)
 
 ## Installation and Configuration
 **Bsure that you have installed python, redis, mysql on your system and have basic understanding of django**
