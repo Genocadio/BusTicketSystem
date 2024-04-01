@@ -25,8 +25,9 @@ git clone https://github.com/Genocadio/BusTicketSystem.git
 cd ./BusTicketSystem/busticket
 3. Install dependencies:
 pip install -r requirements.txt
-4. Create a new mysql database and configure it in database secition in settings.py file in '**busticket\busticket\settings.py**'
-5. Run the server:
+4. Create a new mysql database and configure it in database secition in settings.py file in '**busticket\busticket\settings.py**' 
+5. make sure that you make django migrate by **python manage.py migrate**
+6. Run the server:
 python manage.py runserver
 
 use the available local host link to access the ApI
