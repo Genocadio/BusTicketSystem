@@ -40,7 +40,7 @@ loginRouter.post('/', async (req, res) => {
 
   // Generate JWT token
   console.log('in Login', process.env.SECRET);
-  const token = jwt.sign(userForToken, process.env.SECRET, { expiresIn: '1h' });
+  const token = jwt.sign(userForToken, process.env.SECRET, { expiresIn: '11h' });
 
   res.status(200).send({
     token,
